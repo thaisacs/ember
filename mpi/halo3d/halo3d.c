@@ -21,6 +21,11 @@
 #include <sys/time.h>
 #include <time.h>
 
+extern void init_timestep_();
+extern void begin_timestep_();
+extern void end_timestep_();
+extern void exit_timestep_();
+
 void get_position(const int rank, const int pex, const int pey, const int pez,
                   int* myX, int* myY, int* myZ) {
   const int plane = rank % (pex * pey);
@@ -41,6 +46,8 @@ int convert_position_to_rank(const int pX, const int pY, const int pZ,
 }
 
 int main(int argc, char* argv[]) {
+  init_timestep_();
+
   MPI_Init(&argc, &argv);
 
   int me = -1;
@@ -262,6 +269,7 @@ int main(int argc, char* argv[]) {
   gettimeofday(&start, NULL);
 
   for (int i = 0; i < repeats; ++i) {
+    begin_timestep_();
     requestcount = 0;
 
     if (nanosleep(&sleepTS, &remainTS) == EINTR) {
@@ -319,6 +327,7 @@ int main(int argc, char* argv[]) {
 
     MPI_Waitall(requestcount, requests, status);
     requestcount = 0;
+    end_timestep_();
   }
 
   gettimeofday(&end, NULL);
@@ -352,5 +361,6 @@ int main(int argc, char* argv[]) {
            (bytesXchng / 1024.0) / timeTaken);
   }
 
+  exit_timestep_();
   MPI_Finalize();
 }
