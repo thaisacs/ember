@@ -24,6 +24,7 @@
 extern void init_timestep_();
 extern void begin_timestep_();
 extern void end_timestep_();
+extern void after_timestep_();
 extern void exit_timestep_();
 
 void get_position(const int rank, const int pex, const int pey, const int pez,
@@ -329,6 +330,7 @@ int main(int argc, char* argv[]) {
     requestcount = 0;
     end_timestep_();
   }
+  after_timestep_();
 
   gettimeofday(&end, NULL);
 
